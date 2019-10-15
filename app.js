@@ -9,8 +9,8 @@ const app = express()
 
 
 
-app.get('/', function (request, response) {
-    response.send({
+app.get('/', function (req, res) {
+    res.send({
         greeting: "Hola mundo"
 
     })
@@ -23,36 +23,37 @@ app.get('/omdb', function (req, res) {
         })
     }
 
-    omdb.omdbMovie(req.query.search, function (error, response) {
+    omdb.omdbMovie(req.query.search, function (error, movieData) {
         if (error) {
-            return response.send({
+            return res.send({
                 error: error
             })
         }
         
-        if (response.season) {
-            var title = response.title
-            omdb.omdbSeason(response.title, response.season, function (error, response) {
+        if (movieData.season) {
+            var title = movieData.title
+            omdb.omdbSeason(title, movieData.season, function (error, seriesData) {
                 if (error) {
-                    return response.send({
+                    return res.send({
                         error: error
                     })
                 }
-                response.send({
+                res.send({
                     title: title,
-                    season: response.season,
-                    episodes: response.episodes
+                    season: seriesData.season,
+                    episodes: seriesData.episodes
                 })
                 
             })
 
-        } 
-        res.send(response)
+        } else {
+            res.send(movieData)
+        }
     })
 })
 
-app.get('/*', function (request, response) {
-    response.send({
+app.get('/*', function (req, res) {
+    res.send({
         error: "Ruta no es valida"
     })
 
